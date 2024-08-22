@@ -1,11 +1,16 @@
-<!-- software/templates/software/software_form.html -->
+<!-- Extiende la plantilla base -->
 {% extends 'base.html' %}
 
 {% block content %}
+  <!-- Título de la página dependiendo si el formulario es para actualizar o agregar -->
   <h2>{% if form.instance.pk %}Actualizar Software{% else %}Agregar Nuevo Software{% endif %}</h2>
+  
+  <!-- Formulario para crear o actualizar un software -->
   <form method="post">
     {% csrf_token %}
+    <!-- Muestra el formulario como párrafos -->
     {{ form.as_p }}
+    <!-- Botón para enviar el formulario -->
     <button type="submit" class="btn btn-primary">Guardar</button>
   </form>
 {% endblock %}

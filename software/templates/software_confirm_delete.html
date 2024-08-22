@@ -1,13 +1,20 @@
-<!-- software/templates/software/software_confirm_delete.html -->
+<!-- Extiende la plantilla base -->
 {% extends 'base.html' %}
 
 {% block content %}
+  <!-- Título para confirmar la eliminación -->
   <h2>Confirmar Eliminación</h2>
+  
+  <!-- Mensaje de confirmación para la eliminación del software -->
   <p>¿Estás seguro de que deseas eliminar el software "{{ software.nombre }}"?</p>
 
+  <!-- Formulario para confirmar la eliminación -->
   <form method="post">
     {% csrf_token %}
+    <!-- Botón para confirmar y eliminar el software -->
     <input type="submit" class="btn btn-danger" value="Eliminar">
+    
+    <!-- Enlace para cancelar la eliminación y volver a la lista -->
     <a href="{% url 'software_list' %}" class="btn btn-secondary">Cancelar</a>
   </form>
 {% endblock %}

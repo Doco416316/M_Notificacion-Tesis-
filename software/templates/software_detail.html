@@ -1,13 +1,29 @@
-<!-- software/templates/software/software_detail.html -->
+<!-- Extiende la plantilla base -->
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>{{ software.nombre }}</h2>
-<p>Versión: {{ software.version }}</p>
-<p>Licencia: {{ software.licencia }}</p>
-<p>Fecha de Instalación: {{ software.fecha_instalacion }}</p>
-<a href="{% url 'software_update' software.pk %}">Editar</a>
-<form action="{% url 'software_delete' software.pk %}" method="post">{% csrf_token %}
+  <!-- Muestra el nombre del software como el título principal -->
+  <h2>{{ software.nombre }}</h2>
+  
+  <!-- Muestra la versión del software -->
+  <p>Versión: {{ software.version }}</p>
+  
+  <!-- Muestra la licencia del software -->
+  <p>Licencia: {{ software.licencia }}</p>
+  
+  <!-- Muestra la fecha de instalación del software -->
+  <p>Fecha de Instalación: {{ software.fecha_instalacion }}</p>
+  
+  <!-- Enlace para editar el software -->
+  <a href="{% url 'software_update' software.pk %}">Editar</a>
+  
+  <!-- Formulario para eliminar el software -->
+  <form action="{% url 'software_delete' software.pk %}" method="post">
+    {% csrf_token %}
+    <!-- Botón para confirmar la eliminación -->
     <button type="submit">Eliminar</button>
-</form>
-<a href="{% url 'software_list' %}">Volver a la lista</a>
+  </form>
+  
+  <!-- Enlace para volver a la lista de software -->
+  <a href="{% url 'software_list' %}">Volver a la lista</a>
 {% endblock %}

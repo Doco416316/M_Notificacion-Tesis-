@@ -1,9 +1,15 @@
+<!-- Extiende la plantilla base -->
 {% extends 'base.html' %}
+
 {% block content %}
 <h2>Lista de Software</h2>
+<!-- Enlace para agregar un nuevo software -->
 <a href="{% url 'software_create' %}">Agregar Nuevo Software</a>
+<!-- Lista de todos los softwares -->
 <ul>
+    <!-- Itera sobre cada objeto de software -->
     {% for software in softwares %}
+    <!-- Crea un enlace a la vista de detalles del software -->
     <li><a href="{% url 'software_detail' software.pk %}">{{ software.nombre }}</a></li>
     {% endfor %}
 </ul>
