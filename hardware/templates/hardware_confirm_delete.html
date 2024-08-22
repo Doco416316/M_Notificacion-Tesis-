@@ -1,0 +1,10 @@
+<!-- hardware/templates/hardware/hardware_confirm_delete.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Eliminar Hardware</h2>
+<p>¿Estás seguro de que quieres eliminar "{{ hardware.nombre }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Eliminar</button>
+    <a href="{% url 'hardware_detail' hardware.pk %}">Cancelar</a>
+</form>
+{% endblock %}

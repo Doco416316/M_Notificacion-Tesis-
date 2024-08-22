@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Botones para filtrar por prioridad -->
+    <div class="btn-group mb-3" role="group" aria-label="Filtrar por prioridad">
+        <h3>Clasificar las notificaciones</h3>
+        <a href="?prioridad=alta" class="btn btn-danger {% if request.GET.prioridad == 'alta' %}active{% endif %}">Alta</a>
+        <a href="?prioridad=media" class="btn btn-warning {% if request.GET.prioridad == 'media' %}active{% endif %}">Media</a>
+        <a href="?prioridad=baja" class="btn btn-secondary {% if request.GET.prioridad == 'baja' %}active{% endif %}">Baja</a>
+        <a href="?" class="btn btn-primary {% if not request.GET.prioridad %}active{% endif %}">Mostrar todas</a>
+    </div>
+
+    <!-- Botón para generar el reporte PDF -->
+    <a href="{% url 'generar_reporte_pdf' %}" class="btn btn-info mb-3">Generar Reporte PDF</a>
+    
+    <h2>Lista de Notificaciones</h2>
+
+    <!-- Formulario para eliminar notificaciones seleccionadas -->
+    <form method="post" action="{% url 'notificacion_delete_selected' %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox" id="select_all"> Seleccionar</th>
+                    <th scope="col">Mensaje</th>
+                    <th scope="col">Leído</th>
+                    <th scope="col">Fecha de Creación</th>
+                    <th scope="col">Tipo de Cambio</th>
+                    <th scope="col">Origen</th>
+                    <th scope="col">Prioridad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notificacion in notificaciones %}
+                <tr>
+                    <td><input type="checkbox" name="notificaciones" value="{{ notificacion.id }}"></td>
+                    <td><a href="{% url 'notificacion_detail' notificacion.pk %}">{{ notificacion.mensaje }}</a></td>
+                    <td>{% if notificacion.leido %}Sí{% else %}No{% endif %}</td>
+                    <td>{{ notificacion.fecha_creacion }}</td>
+                    <td>{{ notificacion.tipo_cambio }}</td>
+                    <td>{{ notificacion.origen }}</td>
+                    <td>
+                        <span class="badge {% if notificacion.prioridad == 'alta' %}badge-danger{% elif notificacion.prioridad == 'media' %}badge-warning{% else %}badge-secondary{% endif %}">
+                            {{ notificacion.prioridad }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Dropdown para cambiar la prioridad -->
+        <div class="form-group">
+            <label for="new_priority">Cambiar prioridad a:</label>
+            <select name="new_priority" id="new_priority" class="form-control">
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+            </select>
+        </div>
+
+        <!-- Botones para eliminar o cambiar la prioridad -->
+        <button type="submit" class="btn btn-dark" formaction="{% url 'notificacion_delete_selected' %}">Eliminar Seleccionadas</button>
+        <button type="submit" class="btn btn-success" formaction="{% url 'notificacion_change_priority' %}">Cambiar Prioridad</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('select_all').addEventListener('click', function() {
+        var checkboxes = document.querySelectorAll('input[name="notificaciones"]');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
+{% endblock %}

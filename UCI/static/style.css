@@ -1,0 +1,29 @@
+.table-container {
+    max-height: 400px; /* Ajusta esta altura según tus necesidades */
+    overflow-y: auto;
+    display: block;
+    border: 1px solid #ddd; /* Opcional: añade un borde para mejor visibilidad */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead th {
+    position: -webkit-sticky; /* Para navegadores basados en WebKit */
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* Color de fondo de la cabecera */
+    z-index: 1; /* Asegura que la cabecera esté encima del contenido */
+}
+
+.table tbody tr {
+    height: 50px; /* Ajusta esta altura según tus necesidades */
+}
+
+/* Estilo para las celdas, opcional */
+.table td, .table th {
+    padding: 8px;
+    text-align: left;
+}

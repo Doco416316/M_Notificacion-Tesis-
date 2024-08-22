@@ -1,0 +1,10 @@
+<!-- hardware/templates/hardware/hardware_form.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>{% if form.instance.pk %}Editar Hardware{% else %}Agregar Hardware{% endif %}</h2>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'hardware_list' %}">Cancelar</a>
+{% endblock %}

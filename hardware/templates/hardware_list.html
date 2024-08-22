@@ -1,0 +1,11 @@
+<!-- hardware/templates/hardware/hardware_list.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Lista de Hardware</h2>
+<a href="{% url 'hardware_create' %}">Agregar Nuevo Hardware</a>
+<ul>
+    {% for hardware in hardwares %}
+    <li><a href="{% url 'hardware_detail' hardware.pk %}">{{ hardware.nombre }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,9 @@
+<!-- notificaciones/templates/notificaciones/notificacion_detail.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Notificación</h2>
+<p>{{ notificacion.mensaje }}</p>
+<p>Prioridad: {{ notificacion.prioridad }}</p>
+<p>Fecha de Creación: {{ notificacion.fecha_creacion }}</p>
+<a href="{% url 'notificacion_list' %}">Volver a la lista</a>
+{% endblock %}

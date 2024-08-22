@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Lista de Software</h2>
+<a href="{% url 'software_create' %}">Agregar Nuevo Software</a>
+<ul>
+    {% for software in softwares %}
+    <li><a href="{% url 'software_detail' software.pk %}">{{ software.nombre }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- software/templates/software/software_confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Confirmar Eliminación</h2>
+  <p>¿Estás seguro de que deseas eliminar el software "{{ software.nombre }}"?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="submit" class="btn btn-danger" value="Eliminar">
+    <a href="{% url 'software_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock %}

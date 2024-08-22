@@ -1,0 +1,13 @@
+<!-- software/templates/software/software_detail.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ software.nombre }}</h2>
+<p>Versión: {{ software.version }}</p>
+<p>Licencia: {{ software.licencia }}</p>
+<p>Fecha de Instalación: {{ software.fecha_instalacion }}</p>
+<a href="{% url 'software_update' software.pk %}">Editar</a>
+<form action="{% url 'software_delete' software.pk %}" method="post">{% csrf_token %}
+    <button type="submit">Eliminar</button>
+</form>
+<a href="{% url 'software_list' %}">Volver a la lista</a>
+{% endblock %}
