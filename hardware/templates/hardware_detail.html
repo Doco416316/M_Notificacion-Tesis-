@@ -1,14 +1,26 @@
-<!-- hardware/templates/hardware/hardware_detail.html -->
+<!-- Extiende la plantilla base, que proporciona el diseño general de la página -->
 {% extends 'base.html' %}
+
+<!-- Bloque de contenido principal -->
 {% block content %}
-<h2>{{ hardware.nombre }}</h2>
-<p>Marca: {{ hardware.marca }}</p>
-<p>Modelo: {{ hardware.modelo }}</p>
-<p>Número de Serie: {{ hardware.numero_serie }}</p>
-<p>Fecha de Adquisición: {{ hardware.fecha_adquisicion }}</p>
-<a href="{% url 'hardware_update' hardware.pk %}">Editar</a>
-<form action="{% url 'hardware_delete' hardware.pk %}" method="post">{% csrf_token %}
-    <button type="submit">Eliminar</button>
-</form>
-<a href="{% url 'hardware_list' %}">Volver a la lista</a>
+    <!-- Título que muestra el nombre del hardware -->
+    <h2>{{ hardware.nombre }}</h2>
+
+    <!-- Detalles del hardware -->
+    <p>Marca: {{ hardware.marca }}</p>
+    <p>Modelo: {{ hardware.modelo }}</p>
+    <p>Número de Serie: {{ hardware.numero_serie }}</p>
+    <p>Fecha de Adquisición: {{ hardware.fecha_adquisicion }}</p>
+
+    <!-- Enlace para editar el hardware -->
+    <a href="{% url 'hardware_update' hardware.pk %}">Editar</a>
+
+    <!-- Formulario para eliminar el hardware, protegido con CSRF token -->
+    <form action="{% url 'hardware_delete' hardware.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Eliminar</button>
+    </form>
+
+    <!-- Enlace para volver a la lista de hardware -->
+    <a href="{% url 'hardware_list' %}">Volver a la lista</a>
 {% endblock %}

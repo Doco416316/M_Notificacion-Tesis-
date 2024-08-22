@@ -1,10 +1,18 @@
-<!-- hardware/templates/hardware/hardware_confirm_delete.html -->
+<!-- Extiende la plantilla base, que proporciona el diseño general de la página -->
 {% extends 'base.html' %}
+
+<!-- Bloque de contenido principal -->
 {% block content %}
-<h2>Eliminar Hardware</h2>
-<p>¿Estás seguro de que quieres eliminar "{{ hardware.nombre }}"?</p>
-<form method="post">{% csrf_token %}
-    <button type="submit">Eliminar</button>
-    <a href="{% url 'hardware_detail' hardware.pk %}">Cancelar</a>
-</form>
+    <!-- Título que indica la acción de eliminar hardware -->
+    <h2>Eliminar Hardware</h2>
+
+    <!-- Mensaje de confirmación preguntando si el usuario está seguro de eliminar el hardware -->
+    <p>¿Estás seguro de que quieres eliminar "{{ hardware.nombre }}"?</p>
+
+    <!-- Formulario para confirmar la eliminación del hardware, protegido con CSRF token -->
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Eliminar</button> <!-- Botón para confirmar la eliminación -->
+        <a href="{% url 'hardware_detail' hardware.pk %}">Cancelar</a> <!-- Enlace para cancelar la eliminación y regresar a los detalles del hardware -->
+    </form>
 {% endblock %}

@@ -1,10 +1,23 @@
-<!-- hardware/templates/hardware/hardware_form.html -->
+<!-- Extiende la plantilla base, que proporciona el diseño general de la página -->
 {% extends 'base.html' %}
+
+<!-- Bloque de contenido principal -->
 {% block content %}
-<h2>{% if form.instance.pk %}Editar Hardware{% else %}Agregar Hardware{% endif %}</h2>
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar</button>
-</form>
-<a href="{% url 'hardware_list' %}">Cancelar</a>
+    <!-- Título de la sección, cambia según si se está editando o agregando hardware -->
+    <h2>{% if form.instance.pk %}Editar Hardware{% else %}Agregar Hardware{% endif %}</h2>
+    
+    <!-- Formulario para agregar o editar hardware -->
+    <form method="post">
+        <!-- Token CSRF para la protección contra ataques CSRF -->
+        {% csrf_token %}
+        
+        <!-- Renderiza los campos del formulario como párrafos -->
+        {{ form.as_p }}
+        
+        <!-- Botón para enviar el formulario -->
+        <button type="submit">Guardar</button>
+    </form>
+    
+    <!-- Enlace para cancelar la acción y volver a la lista de hardware -->
+    <a href="{% url 'hardware_list' %}">Cancelar</a>
 {% endblock %}

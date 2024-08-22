@@ -1,11 +1,20 @@
-<!-- hardware/templates/hardware/hardware_list.html -->
+<!-- Extiende la plantilla base, la cual proporciona el diseño general de la página -->
 {% extends 'base.html' %}
+
+<!-- Bloque de contenido principal -->
 {% block content %}
-<h2>Lista de Hardware</h2>
-<a href="{% url 'hardware_create' %}">Agregar Nuevo Hardware</a>
-<ul>
-    {% for hardware in hardwares %}
-    <li><a href="{% url 'hardware_detail' hardware.pk %}">{{ hardware.nombre }}</a></li>
-    {% endfor %}
-</ul>
+    <!-- Título de la sección de la lista de hardware -->
+    <h2>Lista de Hardware</h2>
+    
+    <!-- Enlace para agregar un nuevo hardware, redirige a la vista de creación -->
+    <a href="{% url 'hardware_create' %}">Agregar Nuevo Hardware</a>
+    
+    <!-- Lista no ordenada para mostrar los hardwares -->
+    <ul>
+        <!-- Bucle para iterar sobre la lista de hardware y mostrar cada uno -->
+        {% for hardware in hardwares %}
+            <!-- Cada hardware es un enlace que redirige a su vista de detalles -->
+            <li><a href="{% url 'hardware_detail' hardware.pk %}">{{ hardware.nombre }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
