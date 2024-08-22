@@ -15,6 +15,16 @@
         <a href="?" class="btn btn-primary {% if not request.GET.prioridad %}active{% endif %}">Mostrar todas</a>
     </div>
 
+    <!-- Barra de búsqueda para buscar notificaciones por mensaje -->
+    <form method="get" action="">
+        <div class="input-group mb-3">
+            <input type="text" name="query" value="{{ query }}" class="form-control" placeholder="Buscar notificación..." aria-label="Buscar notificación" aria-describedby="button-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Buscar</button>
+            </div>
+        </div>
+    </form>
+
     <!-- Botón para generar un reporte PDF de las notificaciones -->
     <a href="{% url 'generar_reporte_pdf' %}" class="btn btn-info mb-3">Generar Reporte PDF</a>
     

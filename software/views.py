@@ -27,7 +27,7 @@ def software_create(request):
             # Guarda el nuevo objeto Software y crea una notificación
             software = form.save()
             notificacion = Notificacion.objects.create(
-                mensaje=f"Software {software.nombre} creado"
+                mensaje=f"{software.nombre}"
             )
             print("Nombre del software ", software.nombre)
             # Redirige a la vista de detalles del software creado
@@ -48,7 +48,7 @@ def software_update(request, pk):
             # Guarda los cambios y crea una notificación
             software = form.save()
             notificacion = Notificacion.objects.create(
-                mensaje=f"Software {software.nombre} modificado",
+                mensaje=f"{software.nombre}",
                 tipo_cambio="modificar"
             )
             # Redirige a la vista de detalles del software actualizado
@@ -66,7 +66,7 @@ def software_delete(request, pk):
         # Elimina el objeto Software y crea una notificación
         software.delete()
         notificacion = Notificacion.objects.create(
-            mensaje=f"Software {software.nombre} eliminado",
+            mensaje=f"{software.nombre}",
             tipo_cambio="eliminar"
         )
         # Redirige a la lista de software

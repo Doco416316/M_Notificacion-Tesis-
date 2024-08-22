@@ -26,7 +26,7 @@ def hardware_create(request):
         if form.is_valid():  # Valida el formulario
             hardware = form.save()  # Guarda el nuevo hardware en la base de datos
             # Crea una notificación indicando que se ha agregado un nuevo hardware
-            notificacion = Notificacion.objects.create(mensaje=f"Hardware {hardware.nombre} agregado", origen="hardware")
+            notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", origen="hardware")
             print("Nombre del hardware ", hardware.nombre)
             # Redirige a la vista de detalles del hardware recién creado
             return redirect('hardware_detail', pk=hardware.pk)
@@ -43,7 +43,7 @@ def hardware_update(request, pk):
         if form.is_valid():  # Valida el formulario
             hardware = form.save()  # Guarda los cambios en la base de datos
             # Crea una notificación indicando que el hardware ha sido modificado
-            notificacion = Notificacion.objects.create(mensaje=f"Hardware {hardware.nombre} modificado", tipo_cambio="modificar", origen="hardware")
+            notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", tipo_cambio="modificar", origen="hardware")
             # Redirige a la vista de detalles del hardware actualizado
             return redirect('hardware_detail', pk=hardware.pk)
     else:
@@ -57,7 +57,7 @@ def hardware_delete(request, pk):
     if request.method == "POST":  # Verifica si la solicitud es POST (es decir, si el usuario ha confirmado la eliminación)
         hardware.delete()  # Elimina el hardware de la base de datos
         # Crea una notificación indicando que el hardware ha sido eliminado
-        notificacion = Notificacion.objects.create(mensaje=f"Hardware {hardware.nombre} eliminado", tipo_cambio="eliminar", origen="hardware")
+        notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", tipo_cambio="eliminar", origen="hardware")
         # Redirige a la vista de lista de hardware
         return redirect('hardware_list')
     # Renderiza la plantilla 'hardware_confirm_delete.html' para confirmar la eliminación

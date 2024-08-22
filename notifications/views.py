@@ -11,16 +11,26 @@ def notificacion_list(request):
     # Obtiene el parámetro 'prioridad' de la URL (si existe).
     prioridad = request.GET.get('prioridad')
 
+    # Obtiene el término de búsqueda del parámetro 'query' de la URL (si existe).
+    query = request.GET.get('query', '')
+
     # Si se especificó una prioridad, filtra las notificaciones por esa prioridad.
-    # Ordena las notificaciones por fecha de creación en orden descendente y limita el resultado a las 10 más recientes.
+    # Ordena las notificaciones por fecha de creación en orden descendente.
     if prioridad:
-        notificaciones = Notificacion.objects.filter(prioridad=prioridad).order_by('-fecha_creacion')[:10]
+        notificaciones = Notificacion.objects.filter(prioridad=prioridad).order_by('-fecha_creacion')
     else:
         # Si no se especificó una prioridad, obtiene todas las notificaciones, ordenadas por fecha.
-        notificaciones = Notificacion.objects.all().order_by('-fecha_creacion')[:10]
+        notificaciones = Notificacion.objects.all().order_by('-fecha_creacion')
+
+    # Si se especificó un término de búsqueda, filtra las notificaciones por el contenido del mensaje.
+    if query:
+        notificaciones = notificaciones.filter(mensaje__icontains=query)
+
+    # Limita el resultado a las 10 notificaciones más recientes.
+    notificaciones = notificaciones[:10]
     
-    # Renderiza la plantilla 'notificacion_list.html', pasando las notificaciones como contexto.
-    return render(request, 'notificacion_list.html', {'notificaciones': notificaciones})
+    # Renderiza la plantilla 'notificacion_list.html', pasando las notificaciones y el término de búsqueda como contexto.
+    return render(request, 'notificacion_list.html', {'notificaciones': notificaciones, 'query': query})
 
 def notificacion_detail(request, pk):
     # Obtiene una notificación específica por su clave primaria (pk) o devuelve un error 404 si no existe.
