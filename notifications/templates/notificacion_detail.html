@@ -1,9 +1,23 @@
-<!-- notificaciones/templates/notificaciones/notificacion_detail.html -->
+<!-- Extiende de la plantilla base, heredando su estructura general -->
 {% extends 'base.html' %}
+
 {% block content %}
+<!-- Inicia un bloque de contenido que será insertado en la plantilla base -->
+
 <h2>Notificación</h2>
+<!-- Título de la sección que muestra el detalle de la notificación -->
+
+<!-- Muestra el mensaje de la notificación -->
 <p>{{ notificacion.mensaje }}</p>
+
+<!-- Muestra la prioridad de la notificación -->
 <p>Prioridad: {{ notificacion.prioridad }}</p>
+
+<!-- Muestra la fecha de creación de la notificación -->
 <p>Fecha de Creación: {{ notificacion.fecha_creacion }}</p>
+
+<!-- Enlace para volver a la lista de notificaciones -->
 <a href="{% url 'notificacion_list' %}">Volver a la lista</a>
+
 {% endblock %}
+<!-- Finaliza el bloque de contenido -->
