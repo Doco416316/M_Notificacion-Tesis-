@@ -5,7 +5,7 @@ import pandas as pd  # Importa pandas, una librería para manipulación y análi
 
 # Cargar el modelo entrenado
 # Define la ruta completa al archivo del modelo utilizando os.path.join para asegurar compatibilidad con diferentes sistemas operativos.
-MODEL_PATH = os.path.join(settings.BASE_DIR, 'D:/Proyecto/UCI/m_prioridad.pkl')
+MODEL_PATH = os.path.join(settings.BASE_DIR, '../m_prioridad.pkl')
 
 # Carga el modelo de machine learning previamente entrenado desde el archivo especificado.
 modelo_prioridad = joblib.load(MODEL_PATH)

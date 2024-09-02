@@ -6,7 +6,7 @@
     <!-- Agrega Bootstrap para estilos básicos -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <!-- Enlace al archivo CSS estático -->
-    <link rel="stylesheet" href="{% static 'Style/style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <style>
         body {
             padding-top: 20px;
@@ -25,11 +25,11 @@
         <header>
             <h1>Gestión de Recursos UCI</h1>
             <nav>
-                <ul>
-                    <li><a href="{% url 'software_list' %}">Software</a></li>
-                    <li><a href="{% url 'hardware_list' %}">Hardware</a></li>
-                    <li><a href="{% url 'notificacion_list' %}">Notificaciones</a></li>
-                </ul>
+                <div class="btn-group mb-3">
+                    <a class="btn btn-outline-secondary" href="{% url 'software_list' %}">Software</a>
+                    <a class="btn btn-outline-secondary ml-3" href="{% url 'hardware_list' %}">Hardware</a>
+                    <a class="btn btn-outline-secondary ml-3" href="{% url 'notificacion_list' %}">Notificaciones</a>
+                </div>
             </nav>
         </header>
         {% block content %}

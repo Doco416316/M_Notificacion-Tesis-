@@ -27,7 +27,7 @@ def notificacion_list(request):
         notificaciones = notificaciones.filter(mensaje__icontains=query)
 
     # Limita el resultado a las 10 notificaciones más recientes.
-    notificaciones = notificaciones[:10]
+    notificaciones = notificaciones[:30]
     
     # Renderiza la plantilla 'notificacion_list.html', pasando las notificaciones y el término de búsqueda como contexto.
     return render(request, 'notificacion_list.html', {'notificaciones': notificaciones, 'query': query})
