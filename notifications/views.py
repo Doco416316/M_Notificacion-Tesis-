@@ -1,129 +1,169 @@
-from django.shortcuts import render, get_object_or_404, redirect  # Importa funciones para manejar vistas, obtener objetos o redirigir URLs.
-from django.contrib import messages  # Importa el módulo messages para enviar mensajes de retroalimentación al usuario.
-from .models import Notificacion  # Importa el modelo Notificacion.
-from django.http import HttpResponse  # Importa HttpResponse para enviar respuestas HTTP personalizadas.
-from reportlab.lib.pagesizes import letter  # Importa el tamaño de página carta para PDF.
-from reportlab.pdfgen import canvas  # Importa canvas para generar contenido PDF.
-from io import BytesIO  # Importa BytesIO para manejar flujos de datos en memoria.
-from django.utils.dateformat import format  # Importa la función format para formatear fechas.
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Notificacion
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from io import BytesIO
+from django.utils.dateformat import format
+from .ml_model import clasificar_prioridad, entrenar_con_nueva_notificacion
 
 def notificacion_list(request):
-    # Obtiene el parámetro 'prioridad' de la URL (si existe).
+    # Obtener el parámetro 'prioridad' de la URL (si existe)
     prioridad = request.GET.get('prioridad')
 
-    # Obtiene el término de búsqueda del parámetro 'query' de la URL (si existe).
+    # Obtener el término de búsqueda del parámetro 'query' de la URL (si existe)
     query = request.GET.get('query', '')
 
-    # Si se especificó una prioridad, filtra las notificaciones por esa prioridad.
-    # Ordena las notificaciones por fecha de creación en orden descendente.
+    # Filtrar las notificaciones por prioridad si se especifica
     if prioridad:
         notificaciones = Notificacion.objects.filter(prioridad=prioridad).order_by('-fecha_creacion')
     else:
-        # Si no se especificó una prioridad, obtiene todas las notificaciones, ordenadas por fecha.
+        # Obtener todas las notificaciones ordenadas por fecha si no se especifica prioridad
         notificaciones = Notificacion.objects.all().order_by('-fecha_creacion')
 
-    # Si se especificó un término de búsqueda, filtra las notificaciones por el contenido del mensaje.
+    # Filtrar por término de búsqueda en el contenido del mensaje
     if query:
         notificaciones = notificaciones.filter(mensaje__icontains=query)
 
-    # Limita el resultado a las 10 notificaciones más recientes.
+    # Limitar el resultado a las 30 notificaciones más recientes
     notificaciones = notificaciones[:30]
-    
-    # Renderiza la plantilla 'notificacion_list.html', pasando las notificaciones y el término de búsqueda como contexto.
+
     return render(request, 'notificacion_list.html', {'notificaciones': notificaciones, 'query': query})
 
 def notificacion_detail(request, pk):
-    # Obtiene una notificación específica por su clave primaria (pk) o devuelve un error 404 si no existe.
+    # Obtener una notificación específica o un 404 si no existe
     notificacion = get_object_or_404(Notificacion, pk=pk)
-    
-    # Marca la notificación como leída.
+
+    # Marcar la notificación como leída y guardar
     notificacion.leido = True
-    notificacion.save()  # Guarda los cambios en la base de datos.
-    
-    # Renderiza la plantilla 'notificacion_detail.html', pasando la notificación como contexto.
+    notificacion.save()
+
+    # Si la notificación aún no tiene una prioridad asignada, clasificarla
+    if notificacion.prioridad is None:
+        notificacion.prioridad = clasificar_prioridad(notificacion.leido, notificacion.tipo_cambio, notificacion.origen)
+        notificacion.save()
+
     return render(request, 'notificacion_detail.html', {'notificacion': notificacion})
 
 def notificacion_delete_selected(request):
-    # Este método maneja la eliminación de notificaciones seleccionadas por el usuario.
-
+    # Manejar la eliminación de notificaciones seleccionadas
     if request.method == 'POST':
-        # Obtiene una lista de IDs de notificaciones seleccionadas del formulario POST.
         ids = request.POST.getlist('notificaciones')
-        
         if ids:
-            # Si hay IDs seleccionados, elimina las notificaciones correspondientes.
             Notificacion.objects.filter(id__in=ids).delete()
-            messages.success(request, 'Notificaciones eliminadas correctamente.')  # Envía un mensaje de éxito al usuario.
+            messages.success(request, 'Eliminado correctamente.')
         else:
-            # Si no se seleccionaron IDs, envía un mensaje de error al usuario.
-            messages.error(request, 'No se seleccionaron notificaciones para eliminar.')
-    
-    # Redirige de vuelta a la lista de notificaciones.
+            messages.error(request, 'No se ha seleccionado ninguna notificación.')
     return redirect('notificacion_list')
 
 def notificacion_change_priority(request):
-    # Este método maneja el cambio de prioridad de notificaciones seleccionadas.
-
+    # Manejar el cambio de prioridad de notificaciones seleccionadas
     if request.method == 'POST':
-        # Obtiene una lista de IDs de notificaciones seleccionadas del formulario POST.
         ids = request.POST.getlist('notificaciones')
-        # Obtiene la nueva prioridad seleccionada en el formulario POST.
         new_priority = request.POST.get('new_priority')
 
         if ids and new_priority:
-            # Si hay IDs seleccionados y una nueva prioridad especificada, actualiza la prioridad de esas notificaciones.
             Notificacion.objects.filter(id__in=ids).update(prioridad=new_priority)
-            messages.success(request, 'Prioridad de notificaciones cambiada correctamente.')  # Envía un mensaje de éxito al usuario.
+            messages.success(request, f'Prioridad cambiada a ({new_priority}) correctamente.')
         else:
-            # Si no se seleccionaron IDs o no se especificó una nueva prioridad, envía un mensaje de error.
-            messages.error(request, 'No se seleccionaron notificaciones o no se especificó una nueva prioridad.')
-    
-    # Redirige de vuelta a la lista de notificaciones.
+            messages.error(request, 'No se ha seleccionado ninguna notificación')
     return redirect('notificacion_list')
 
 def generar_reporte_pdf(request):
-    # Este método genera un reporte en formato PDF con todas las notificaciones.
-
-    # Crea un buffer en memoria para almacenar el PDF temporalmente.
     buffer = BytesIO()
-    
-    # Crea un objeto canvas para el PDF, usando el buffer como destino.
-    p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter  # Obtiene las dimensiones de la página carta.
-    
-    # Escribe los títulos de las columnas en el PDF.
-    p.drawString(30, height - 50, "Mensaje")
-    p.drawString(250, height - 50, "Fecha de Creación")
-    p.drawString(400, height - 50, "Origen")
-    
-    # Obtiene todas las notificaciones, ordenadas por fecha de creación en orden descendente.
-    notificaciones = Notificacion.objects.all().order_by('-fecha_creacion')
-    
-    # Posición inicial para escribir las filas de notificaciones.
-    y_position = height - 70
-    
-    for notificacion in notificaciones:
-        # Formatea la fecha de creación en el formato 'día/mes/año horas:minutos'.
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Add title
+    title = Paragraph("Reporte de Notificaciones", styles['Title'])
+    elements.append(title)
+
+    # Prepare data for the table
+    notifications = Notificacion.objects.all().order_by('-fecha_creacion')
+    data = [['Mensaje', 'Fecha de Creación', 'Origen', 'Prioridad']]
+    for notificacion in notifications:
         fecha_formateada = format(notificacion.fecha_creacion, 'd/m/Y H:i')
-        
-        # Escribe los detalles de la notificación en el PDF.
-        p.drawString(30, y_position, notificacion.mensaje)
-        p.drawString(250, y_position, fecha_formateada)
-        p.drawString(400, y_position, notificacion.origen)
-        y_position -= 20  # Desciende la posición vertical para la siguiente notificación.
+        data.append([notificacion.mensaje, fecha_formateada, notificacion.origen, notificacion.prioridad])
     
-    # Finaliza la página del PDF.
-    p.showPage()
-    p.save()
+    # Create table with data
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black),
+    ]))
+    elements.append(table)
     
-    # Obtiene el contenido del buffer.
+    # Calculate statistics
+    from collections import Counter
+
+    priorities = [n.prioridad for n in notifications]
+    origins = [n.origen for n in notifications]
+    priority_counts = Counter(priorities)
+    origin_counts = Counter(origins)
+    total_notifications = len(notifications)
+    
+    def get_percentage(count):
+        return (count / total_notifications * 100) if total_notifications > 0 else 0
+
+    # Add statistics to the report
+    elements.append(Paragraph(" ", styles['Normal']))  # Add some space
+    elements.append(Paragraph("Estadísticas:", styles['Heading2']))
+
+    # Priorities statistics
+    elements.append(Paragraph("Cantidad y porcentaje de notificaciones por prioridad:", styles['Normal']))
+    for priority, count in priority_counts.items():
+        percentage = get_percentage(count)
+        elements.append(Paragraph(f"Prioridad {priority}: {count} ({percentage:.2f}%)", styles['Normal']))
+
+    # Origins statistics
+    elements.append(Paragraph("Cantidad y porcentaje de notificaciones por origen:", styles['Normal']))
+    for origin, count in origin_counts.items():
+        percentage = get_percentage(count)
+        elements.append(Paragraph(f"Origen {origin}: {count} ({percentage:.2f}%)", styles['Normal']))
+
+    doc.build(elements)
+
     buffer.seek(0)
     pdf = buffer.getvalue()
     buffer.close()
-    
-    # Crea una respuesta HTTP con el contenido del PDF, estableciendo el tipo de contenido a 'application/pdf'.
+
     response = HttpResponse(pdf, content_type='application/pdf')
-    # Establece las cabeceras para que el PDF se descargue con un nombre específico.
     response['Content-Disposition'] = 'attachment; filename="reporte_notificaciones.pdf"'
-    
-    return response  # Devuelve la respuesta con el PDF.
+
+    return response
+
+def notificacion_create(request):
+    # Crear una nueva notificación
+    if request.method == 'POST':
+        mensaje = request.POST['mensaje']
+        tipo_cambio = request.POST['tipo_cambio']
+        origen = request.POST['origen']
+
+        # Clasificar la prioridad usando el modelo entrenado
+        prioridad_predicha = clasificar_prioridad(False, tipo_cambio, origen)
+
+        # Crear y guardar la nueva notificación
+        nueva_notificacion = Notificacion.objects.create(
+            mensaje=mensaje,
+            tipo_cambio=tipo_cambio,
+            origen=origen,
+            prioridad=prioridad_predicha,
+            leido=False
+        )
+
+        # Entrenar el modelo con la nueva notificación
+        entrenar_con_nueva_notificacion(False, tipo_cambio, origen, prioridad_predicha)
+
+        messages.success(request, 'Notificación creada y modelo actualizado correctamente.')
+        return redirect('notificacion_list')
+
+    return render(request, 'notificacion_create.html')

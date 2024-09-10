@@ -1,28 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
 {% block content %}
 <div class="container">
+    <!-- Mostrar mensajes de Django -->
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <!-- Grupo de botones para filtrar notificaciones por prioridad -->
-    <div class="btn-group mb-3" id="bot" role="group" aria-label="Filtrar por prioridad">
+    <div class="btn-group mb-3" role="group" aria-label="Filtrar por prioridad">
         <h3>Clasificar las notificaciones:</h3>
         <div>
-            <a href="?prioridad=alta" id="bot"  class="btn btn-danger ml-3 {% if request.GET.prioridad == 'alta' %}active{% endif %}">Alta</a>
-            <a href="?prioridad=media" id="bot"  class="btn btn-warning ml-2 {% if request.GET.prioridad == 'media' %}active{% endif %}">Media</a>
-            <a href="?prioridad=baja" id="bot"  class="btn btn-secondary ml-2 {% if request.GET.prioridad == 'baja' %}active{% endif %}">Baja</a>
-            <a href="?" id="bot"  class="btn btn-primary ml-2 {% if not request.GET.prioridad %}active{% endif %}">Mostrar todas</a>
+            <a href="?prioridad=alta" class="btn btn-danger ml-3 {% if request.GET.prioridad == 'alta' %}active{% endif %}">Alta</a>
+            <a href="?prioridad=media" class="btn btn-warning ml-2 {% if request.GET.prioridad == 'media' %}active{% endif %}">Media</a>
+            <a href="?prioridad=baja" class="btn btn-secondary ml-2 {% if request.GET.prioridad == 'baja' %}active{% endif %}">Baja</a>
+            <a href="?" class="btn btn-primary ml-2 {% if not request.GET.prioridad %}active{% endif %}">Mostrar todas</a>
         </div>
     </div>
    
     <!-- Barra de búsqueda para buscar notificaciones por mensaje -->
     <form method="get" action="">
         <div class="input-group mb-3">
-            <input type="text" name="query" value="{{ query }}" class="form-control" placeholder="Buscar notificación..." aria-label="Buscar notificación" aria-describedby="button-addon2">
+            <input type="text" name="query" value="{{ request.GET.query }}" class="form-control" placeholder="Buscar notificación..." aria-label="Buscar notificación" aria-describedby="button-addon2">
             <div class="input-group-append">
                 <button class="btn btn-outline-dark" type="submit" id="button-addon2">Buscar</button>
             </div>
         </div>
     </form>
+    
     <h2>Lista de Notificaciones</h2>
 
     <!-- Formulario para eliminar notificaciones seleccionadas -->
@@ -32,7 +45,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col"><input type="checkbox" id="select_all"> Select</th>
+                        <th scope="col"><input type="checkbox" id="select_all"> Seleccionar</th>
                         <th scope="col">Mensaje</th>
                         <th scope="col">Leído</th>
                         <th scope="col">Fecha de Creación</th>
@@ -72,12 +85,11 @@
         </div>
         <div class="container-fluid">
             <!-- Botones para eliminar notificaciones seleccionadas o cambiar su prioridad -->
-            <button type="submit" class="btn btn-dark mr-4" formaction="{% url 'notificacion_delete_selected' %}">Eliminar Seleccionadas</button>
-            <button type="submit" class="btn btn-success mr-4" formaction="{% url 'notificacion_change_priority' %}">Cambiar Prioridad</button>
+            <button type="submit" class="btn btn-dark mr-4" formaction="{% url 'notificacion_delete_selected' %}" onclick="return confirm('¿Estás seguro que desea eliminar?')">Eliminar Seleccionadas</button>
+            <button type="submit" class="btn btn-success mr-4" formaction="{% url 'notificacion_change_priority' %}" onclick="return confirm('¿Estás seguro que desea cambiar la prioridad?')">Cambiar Prioridad</button>
             <!-- Botón para generar un reporte PDF de las notificaciones -->
-            <a href="{% url 'generar_reporte_pdf' %}" class="btn btn-info ">Generar Reporte PDF</a>
+            <a href="{% url 'generar_reporte_pdf' %}" class="btn btn-info">Generar Reporte PDF</a>
         </div>
-
     </form>
 </div>
 
