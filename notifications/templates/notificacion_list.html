@@ -85,8 +85,8 @@
         </div>
         <div class="container-fluid">
             <!-- Botones para eliminar notificaciones seleccionadas o cambiar su prioridad -->
-            <button type="submit" class="btn btn-dark mr-4" formaction="{% url 'notificacion_delete_selected' %}" onclick="return confirm('¿Estás seguro que desea eliminar?')">Eliminar Seleccionadas</button>
-            <button type="submit" class="btn btn-success mr-4" formaction="{% url 'notificacion_change_priority' %}" onclick="return confirm('¿Estás seguro que desea cambiar la prioridad?')">Cambiar Prioridad</button>
+            <button type="submit" class="btn btn-dark mr-4" formaction="{% url 'notificacion_delete_selected' %}" onclick="return confirm('¿Estás seguro que deseas eliminar?')">Eliminar Seleccionadas</button>
+            <button type="submit" class="btn btn-success mr-4" formaction="{% url 'notificacion_change_priority' %}" onclick="return confirm('¿Estás seguro que deseas cambiar la prioridad?')">Cambiar Prioridad</button>
             <!-- Botón para generar un reporte PDF de las notificaciones -->
             <a href="{% url 'generar_reporte_pdf' %}" class="btn btn-info">Generar Reporte PDF</a>
         </div>
