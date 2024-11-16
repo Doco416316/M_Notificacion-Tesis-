@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-<<<<<<< HEAD
 {% load static %}
 <link rel="stylesheet" href="{% static 'style.css' %}">
 <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
@@ -21,18 +20,10 @@
 </style>
 <div class="container my-5">
     <div class="card shadow-sm" style="background-color: #DFD3C3; border-radius: 20px;">
-=======
-{% block content %}
-<div class="container my-5">
-    <!-- Contenedor con márgenes superiores e inferiores -->
-    <div class="card shadow-sm" style="background-color: #f9f9f9;">
-        <!-- Tarjeta con sombra y fondo claro -->
->>>>>>> f293c898ee5da6910943c0b56482d0e1395b43d4
         <div class="card-body">
             <h2 class="card-title text-center">Detalles de la Notificación</h2>
             <hr>
             <div class="mt-4">
-<<<<<<< HEAD
                 <h2 class="text-primary">{{ notificacion.mensaje }}</h2>
             </div>
             <div class="mt-3">
@@ -66,41 +57,6 @@
                 {% if notificacion.software %}
                     <a href="{% url 'software:software_detail' notificacion.software.pk %}" class="btn btn-outline-primary mt-4" aria-label="Ver detalles del software">Ver Detalles del Software</a>
                 {% endif %}
-=======
-                <!-- Sección del mensaje de la notificación -->
-                <h2 class="text-primary">{{ notificacion.mensaje }}</h2>
-            </div>
-            <div class="mt-3">
-                <!-- Sección de la prioridad -->
-                <p><strong>Prioridad:</strong> 
-                    <span class="badge {% if notificacion.prioridad == 'alta' %} bg-danger {% elif notificacion.prioridad == 'media' %} bg-warning text-dark {% else %} bg-secondary {% endif %}">
-                        {{ notificacion.prioridad|title }}
-                    </span>
-                </p>
-            </div>
-            <div class="mt-3">
-                <!-- Sección del origen -->
-                <p><strong>Origen:</strong> 
-                    <span class="badge bg-info">{{ notificacion.origen|title }}</span>
-                </p>
-            </div>
-            <div class="mt-3">
-                <!-- Sección del tipo de cambio -->
-                <p><strong>Tipo de Cambio:</strong> 
-                    {{ notificacion.tipo_cambio|title }}
-                </p>
-            </div>
-            <div class="mt-3">
-                <!-- Sección de la fecha de creación -->
-                <p><strong>Fecha de Creación:</strong> 
-                    {{ notificacion.fecha_creacion|date:"d M Y H:i" }}
-                </p>
-            </div>
-            <hr>
-            <div class="text-center">
-                <!-- Botón para regresar a la lista de notificaciones -->
-                <a href="{% url 'notificacion_list' %}" class="btn btn-outline-secondary mt-4">Volver a la lista</a>
->>>>>>> f293c898ee5da6910943c0b56482d0e1395b43d4
             </div>
         </div>
     </div>

@@ -7,7 +7,6 @@ from sklearn.linear_model import SGDClassifier  # Modelo que soporta entrenamien
 # Ruta donde se guarda el modelo
 MODEL_PATH = os.path.join(settings.BASE_DIR, '../m_prioridad.pkl')
 
-<<<<<<< HEAD
 def cargar_o_inicializar_modelo():
     """
     Carga el modelo de clasificación si existe, o inicializa un nuevo modelo si no.
@@ -21,17 +20,6 @@ def cargar_o_inicializar_modelo():
 
 # Cargar el modelo al iniciar el módulo
 modelo_prioridad = cargar_o_inicializar_modelo()
-=======
-# Función para cargar o inicializar el modelo
-def cargar_o_inicializar_modelo():
-    if os.path.exists(MODEL_PATH):
-        # Si el modelo existe, lo cargamos
-        modelo_prioridad = joblib.load(MODEL_PATH)
-    else:
-        # Si el modelo no existe, inicializamos un nuevo modelo que soporte entrenamiento incremental
-        modelo_prioridad = SGDClassifier()
-    return modelo_prioridad
->>>>>>> f293c898ee5da6910943c0b56482d0e1395b43d4
 
 # Cargar el modelo
 modelo_prioridad = cargar_o_inicializar_modelo()
@@ -46,7 +34,6 @@ def clasificar_prioridad(leido, tipo_cambio, origen):
     data = pd.DataFrame({
         'Leido': [leido],
         'Tipo de Cambio': [tipo_cambio],
-<<<<<<< HEAD
         'Origen': [origen]})
     # Predecir la prioridad utilizando el modelo
     prioridad_predicha = modelo_prioridad.predict(data)
@@ -62,26 +49,10 @@ def entrenar_con_nueva_notificacion(leido, tipo_cambio, origen, prioridad):
     :param prioridad: Prioridad de la notificación ('alta', 'media', 'baja').
     """
     global modelo_prioridad  # Usamos el modelo cargado globalmente.
-=======
-        'Origen': [origen]
-    })
-
-    # Predecir la prioridad
-    prioridad_predicha = modelo_prioridad.predict(data)
-
-    # Retornar la prioridad predicha
-    return prioridad_predicha[0]
-
-# Función para entrenar el modelo con una nueva notificación
-def entrenar_con_nueva_notificacion(leido, tipo_cambio, origen, prioridad):
-    global modelo_prioridad  # Usamos el modelo cargado globalmente.
-
->>>>>>> f293c898ee5da6910943c0b56482d0e1395b43d4
     # Crear el DataFrame de entrenamiento con la nueva notificación
     X_nueva = pd.DataFrame({
         'Leido': [leido],
         'Tipo de Cambio': [tipo_cambio],
-<<<<<<< HEAD
         'Origen': [origen]})
     # La prioridad proporcionada será la etiqueta de entrenamiento
     y_nueva = [prioridad]  # Prioridad es la etiqueta correspondiente.
@@ -90,16 +61,3 @@ def entrenar_con_nueva_notificacion(leido, tipo_cambio, origen, prioridad):
     # Guardar el modelo actualizado
     joblib.dump(modelo_prioridad, MODEL_PATH)
 
-=======
-        'Origen': [origen]
-    })
-
-    # La prioridad proporcionada será la etiqueta de entrenamiento
-    y_nueva = [prioridad]
-
-    # Entrenamiento incremental del modelo
-    modelo_prioridad.partial_fit(X_nueva, y_nueva, classes=[0, 1, 2])  # Asegúrate de usar las clases adecuadas para tu caso.
-
-    # Guardar el modelo actualizado
-    joblib.dump(modelo_prioridad, MODEL_PATH)
->>>>>>> f293c898ee5da6910943c0b56482d0e1395b43d4
