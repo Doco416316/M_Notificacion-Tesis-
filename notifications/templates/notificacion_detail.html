@@ -1,29 +1,64 @@
-<!-- Extiende de la plantilla base, heredando su estructura general -->
 {% extends 'base.html' %}
-
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
 {% block content %}
-<!-- Inicia un bloque de contenido que será insertado en la plantilla base -->
-
-<h2>Notificación</h2>
-<!-- Título de la sección que muestra el detalle de la notificación -->
-
-<!-- Muestra el mensaje de la notificación -->
-<h4>{{ notificacion.mensaje }}</h4>
-
-<!-- Muestra la prioridad de la notificación -->
-<p>Prioridad: {{ notificacion.prioridad }}</p>
-
-<!-- Muestra el origen de la notificación -->
-<p>Origen: {{ notificacion.origen }}</p>
-
-<!-- Muestra el tipo de cambio de la notificación -->
-<p>Tipo de Cambio: {{ notificacion.tipo_cambio }}</p>
-
-<!-- Muestra la fecha de creación de la notificación -->
-<p>Fecha de Creación: {{ notificacion.fecha_creacion }}</p>
-
-<!-- Enlace para volver a la lista de notificaciones -->
-<a href="{% url 'notificacion_list' %}">Volver a la lista</a>
-
+<style>
+    body{
+        background-color: #DFD3C3;
+    }
+    .container {
+        background-color: #F8EDE3;
+        padding: 20px;
+        border-radius: 20px;
+    }
+    .card-body{
+        background-color: #F8EDE3;
+        padding: 20px;
+        border-radius: 20px;
+    }
+</style>
+<div class="container my-5">
+    <div class="card shadow-sm" style="background-color: #DFD3C3; border-radius: 20px;">
+        <div class="card-body">
+            <h2 class="card-title text-center">Detalles de la Notificación</h2>
+            <hr>
+            <div class="mt-4">
+                <h2 class="text-primary">{{ notificacion.mensaje }}</h2>
+            </div>
+            <div class="mt-3">
+                <h5><strong>Prioridad:</strong> 
+                    <span class="badge {% if notificacion.prioridad == 'alta' %} bg-danger {% elif notificacion.prioridad == 'media' %} bg-warning text-dark {% else %} bg-success {% endif %}">
+                        {{ notificacion.prioridad|title }}
+                    </span>
+                </h5>
+            </div>
+            <div class="mt-3">
+                <h5><strong>Origen:</strong> 
+                    <span class="badge bg-info">{{ notificacion.origen|title }}</span>
+                </h5>
+            </div>
+            <div class="mt-3">
+                <h5><strong>Tipo de Cambio:</strong> 
+                    {{ notificacion.tipo_cambio|title }}
+                </h5>
+            </div>
+            <div class="mt-3">
+                <h5><strong>Fecha de Creación:</strong> 
+                    {{ notificacion.fecha_creacion|date:"d M Y H:i" }}
+                </h5>
+            </div>
+            <hr>
+            <div class="text-center">
+                <a href="{% url 'notificacion_list' %}" class="btn btn-outline-secondary mt-4" aria-label="Volver a la lista de notificaciones">Volver a la lista</a>
+                {% if notificacion.hardware %}
+                    <a href="{% url 'hardware:hardware_detail' notificacion.hardware.pk %}" class="btn btn-outline-primary mt-4" aria-label="Ver detalles del hardware">Ver Detalles del Hardware</a>
+                {% endif %}
+                {% if notificacion.software %}
+                    <a href="{% url 'software:software_detail' notificacion.software.pk %}" class="btn btn-outline-primary mt-4" aria-label="Ver detalles del software">Ver Detalles del Software</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
-<!-- Finaliza el bloque de contenido -->

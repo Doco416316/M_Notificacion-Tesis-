@@ -1,71 +1,101 @@
-from django.db import models  # Importa el módulo models de Django, necesario para definir modelos de base de datos.
-import joblib  # Importa joblib, usado para cargar y guardar modelos de machine learning.
-import os  # Importa os, que permite interactuar con el sistema operativo, como manejar rutas de archivos.
-from django.conf import settings  # Importa el objeto settings de Django, que contiene la configuración del proyecto.
-import pandas as pd  # Importa pandas, una librería para manipulación y análisis de datos.
-from sklearn.preprocessing import LabelEncoder  # Importa LabelEncoder, usado para convertir valores categóricos en números.
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+import joblib
+import os
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
+# Modelo para representar información del hardware
+class Hardware(models.Model):
+    nombre = models.CharField(max_length=100)
+    marca = models.CharField(max_length=50)
+    modelo = models.CharField(max_length=50)
+    numero_serie = models.CharField(max_length=100)
+    fecha_adquisicion = models.DateField()
+    def __str__(self):
+        return self.nombre
+
+# Modelo para representar información del software
+class Software(models.Model):
+    nombre = models.CharField(max_length=100)
+    version = models.CharField(max_length=50)
+    licencia = models.CharField(max_length=50)
+    fecha_instalacion = models.DateField()
+    def __str__(self):
+        return self.nombre
+
+# Modelo para las notificaciones generadas en el sistema
 class Notificacion(models.Model):
-    # Define las opciones de prioridad que puede tener una notificación.
+    # Definición de prioridades para notificaciones
     PRIORIDAD_CHOICES = [
         ('alta', 'Alta'),
         ('media', 'Media'),
-        ('baja', 'Baja'),
-    ]
-
-    # Campos del modelo Notificacion
-    mensaje = models.TextField()  # Campo para almacenar el mensaje de la notificación.
-    prioridad = models.CharField(max_length=5, choices=PRIORIDAD_CHOICES, blank=True)  # Prioridad con opciones limitadas.
-    fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha de creación, se asigna automáticamente al guardar.
-    leido = models.BooleanField(default=False)  # Indica si la notificación ha sido leída.
-
-    # Define las opciones de tipo de cambio que puede haber en una notificación.
+        ('baja', 'Baja'),]
+    # Campos de la notificación
+    mensaje = models.TextField()
+    prioridad = models.CharField(max_length=5, choices=PRIORIDAD_CHOICES, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    leido = models.BooleanField(default=False)
+    # Tipos de cambio que pueden originar una notificación
     TIPO_CAMBIO_CHOICES = [
         ('agregar', 'Agregar'),
         ('modificar', 'Modificar'),
-        ('eliminar', 'Eliminar'),
-    ]
-    tipo_cambio = models.CharField(max_length=10, choices=TIPO_CAMBIO_CHOICES, default='agregar')  # Tipo de cambio.
-    origen = models.CharField(max_length=50, default='software')  # Origen del cambio, puede ser 'software' o 'hardware'.
+        ('eliminar', 'Eliminar'),]
+    tipo_cambio = models.CharField(max_length=10, choices=TIPO_CAMBIO_CHOICES, default='agregar')
+    origen = models.CharField(max_length=50, default='software')
+    # Relaciones opcionales a modelos Hardware y Software
+    hardware = models.ForeignKey(Hardware, on_delete=models.CASCADE, null=True, blank=True)
+    software = models.ForeignKey(Software, on_delete=models.CASCADE, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Solo calcular la prioridad si no ha sido definida manualmente.
+        """
+        Sobrescribe el método save para predecir la prioridad de la notificación
+        si esta no está definida.
+        """
         if not self.prioridad:
-            self.prioridad = self.predecir_prioridad()  # Llama al método predecir_prioridad si no hay prioridad definida.
-        super().save(*args, **kwargs)  # Guarda el objeto Notificacion en la base de datos.
+            self.prioridad = self.predecir_prioridad()
+        super().save(*args, **kwargs)
 
     def predecir_prioridad(self):
-        # Cargar el modelo entrenado desde la ruta especificada.
-        modelo_path = os.path.join(settings.BASE_DIR, 'D:/Proyecto/UCI/m_prioridad.pkl')
+        """
+        Utiliza un modelo preentrenado para predecir la prioridad de la notificación.
+        Retorna 'alta', 'media' o 'baja' según la predicción.
+        """
+        # Cargar el modelo de prioridad
+        modelo_path = os.path.join(settings.BASE_DIR, 'm_prioridad.pkl')
         modelo_prioridad = joblib.load(modelo_path)
-
-        # Entrena un LabelEncoder con las mismas categorías que se usaron para entrenar el modelo.
+        # Codificación de los datos para el modelo
         tipo_cambio_encoder = LabelEncoder().fit(['agregar', 'modificar', 'eliminar'])
-        tipo_cambio_encoded = tipo_cambio_encoder.transform([self.tipo_cambio])[0]  # Codifica el tipo de cambio actual.
-
-        # Codificación del campo 'origen', donde 'hardware' es 1 y 'software' es 0.
-        origen_encoded = 1 if self.origen == 'hardware' else 0
-
-        # Crear un DataFrame con los valores numéricos para la predicción.
+        tipo_cambio_encoded = tipo_cambio_encoder.transform([self.tipo_cambio])[0]
+        origen_encoded = 1 if self.origen == 'hardware' else 0  # Codificación binaria para el origen
+        # Crear DataFrame para la predicción
         data = pd.DataFrame({
-            'Leido': [self.leido],  # Valor de si la notificación ha sido leída o no.
-            'Tipo de Cambio': [tipo_cambio_encoded],  # Tipo de cambio codificado.
-            'Origen': [origen_encoded],  # Origen codificado.
-        })
-        data = data[['Leido', 'Tipo de Cambio', 'Origen']]  # Ordena las columnas del DataFrame.
-
-        # Imprimir los datos para depuración (esto es útil para verificar lo que se está pasando al modelo).
+            'Leido': [self.leido],
+            'Tipo de Cambio': [tipo_cambio_encoded],
+            'Origen': [origen_encoded],})
+        data = data[['Leido', 'Tipo de Cambio', 'Origen']]
+        # Imprimir los datos procesados para depuración
         print("Datos para predicción:", data)
-
-        # Utiliza el modelo cargado para predecir la prioridad basada en los datos.
+        # Realizar la predicción y mapear el resultado
         prioridad_predicha_num = modelo_prioridad.predict(data)[0]
-
-        # Mapear la prioridad numérica a su representación categórica en el modelo.
-        prioridad_mapeo = {0: 'alta', 1: 'baja', 2: 'media'}  # Diccionario de mapeo de valores numéricos a prioridades.
-        prioridad_predicha = prioridad_mapeo.get(prioridad_predicha_num, 'baja')  # Devuelve la prioridad predicha.
-
-        return prioridad_predicha  # Retorna la prioridad predicha.
-
+        prioridad_mapeo = {0: 'alta', 1: 'baja', 2: 'media'}
+        return prioridad_mapeo.get(prioridad_predicha_num, 'baja')
     def __str__(self):
-        # Representa el objeto Notificacion como una cadena, mostrando la prioridad y la fecha de creación.
         return f"{self.prioridad} - {self.fecha_creacion}"
+
+# Modelo para almacenar notificaciones eliminadas
+class NotificacionEliminada(models.Model):
+    notificacion = models.ForeignKey(Notificacion, on_delete=models.CASCADE)
+    fecha_eliminacion = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f"{self.notificacion.mensaje} - Eliminada en {self.fecha_eliminacion}"
+
+# Modelo para registrar modificaciones de prioridad de las notificaciones
+class NotificacionModificada(models.Model):
+    notificacion = models.ForeignKey('Notificacion', on_delete=models.CASCADE)
+    prioridad_anterior = models.CharField(max_length=10, choices=[('alta', 'Alta'), ('media', 'Media'), ('baja', 'Baja')])
+    nueva_prioridad = models.CharField(max_length=10, choices=[('alta', 'Alta'), ('media', 'Media'), ('baja', 'Baja')])
+    fecha_modificacion = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Notificación modificada: {self.notificacion.id} - {self.fecha_modificacion}"

@@ -8,68 +8,64 @@ from .forms import SoftwareForm
 from notifications.models import Notificacion
 
 def software_list(request):
-    # Obtiene todos los objetos de Software
-    softwares = Software.objects.all()
-    # Renderiza la plantilla 'software_list.html' con el contexto de los software
-    return render(request, 'software_list.html', {'softwares': softwares})
+    """
+    Vista para listar todos los objetos de Software.
+    """
+    softwares = Software.objects.all()  # Obtiene todos los objetos de Software
+    return render(request, 'software_list.html', {'softwares': softwares})  # Renderiza la plantilla
 
 def software_detail(request, pk):
-    # Obtiene el objeto Software específico usando el pk proporcionado
-    software = get_object_or_404(Software, pk=pk)
-    # Renderiza la plantilla 'software_detail.html' con el contexto del software
-    return render(request, 'software_detail.html', {'software': software})
+    """
+    Vista para mostrar los detalles de un software específico.
+    
+    :param pk: Clave primaria del software a mostrar.
+    """
+    software = get_object_or_404(Software, pk=pk)  # Obtiene el objeto Software específico
+    return render(request, 'software_detail.html', {'software': software})  # Renderiza la plantilla
 
 def software_create(request):
+    """
+    Vista para crear un nuevo software.
+    """
     if request.method == "POST":
-        # Crea una instancia de SoftwareForm con los datos del POST
-        form = SoftwareForm(request.POST)
+        form = SoftwareForm(request.POST)  # Crea una instancia del formulario con los datos del POST
         if form.is_valid():
-            # Guarda el nuevo objeto Software y crea una notificación
-            software = form.save()
-            notificacion = Notificacion.objects.create(
-                mensaje=f"{software.nombre}"
-            )
-            print("Nombre del software ", software.nombre)
-            # Redirige a la vista de detalles del software creado
-            return redirect('software_detail', pk=software.pk)
+            software = form.save()  # Guarda el nuevo objeto Software
+            # Crea una notificación para el software creado
+            Notificacion.objects.create(mensaje=f"{software.nombre}")
+            return redirect('software_detail', pk=software.pk)  # Redirige a los detalles del software
     else:
-        # Si no es un POST, crea un formulario vacío
-        form = SoftwareForm()
-    # Renderiza la plantilla 'software_form.html' con el contexto del formulario
-    return render(request, 'software_form.html', {'form': form})
+        form = SoftwareForm()  # Si no es un POST, crea un formulario vacío
+    return render(request, 'software_form.html', {'form': form})  # Renderiza la plantilla
 
 def software_update(request, pk):
-    # Obtiene el objeto Software específico usando el pk proporcionado
-    software = get_object_or_404(Software, pk=pk)
+    """
+    Vista para editar un software existente.
+    
+    :param pk: Clave primaria del software a editar.
+    """
+    software = get_object_or_404(Software, pk=pk)  # Obtiene el objeto Software específico
     if request.method == "POST":
-        # Crea una instancia de SoftwareForm con los datos del POST y el objeto actual
-        form = SoftwareForm(request.POST, instance=software)
+        form = SoftwareForm(request.POST, instance=software)  # Crea el formulario con los datos actuales
         if form.is_valid():
-            # Guarda los cambios y crea una notificación
-            software = form.save()
-            notificacion = Notificacion.objects.create(
-                mensaje=f"{software.nombre}",
-                tipo_cambio="modificar"
-            )
-            # Redirige a la vista de detalles del software actualizado
-            return redirect('software_detail', pk=software.pk)
+            software = form.save()  # Guarda los cambios
+            # Crea una notificación para el software modificado
+            Notificacion.objects.create(mensaje=f"{software.nombre}", tipo_cambio="modificar")
+            return redirect('software_detail', pk=software.pk)  # Redirige a los detalles del software
     else:
-        # Si no es un POST, crea un formulario con los datos del objeto actual
-        form = SoftwareForm(instance=software)
-    # Renderiza la plantilla 'software_form.html' con el contexto del formulario
-    return render(request, 'software_form.html', {'form': form})
+        form = SoftwareForm(instance=software)  # Si no es un POST, crea un formulario con los datos actuales
+    return render(request, 'software_form.html', {'form': form})  # Renderiza la plantilla
 
 def software_delete(request, pk):
-    # Obtiene el objeto Software específico usando el pk proporcionado
-    software = get_object_or_404(Software, pk=pk)
+    """
+    Vista para eliminar un software existente.
+    
+    :param pk: Clave primaria del software a eliminar.
+    """
+    software = get_object_or_404(Software, pk=pk)  # Obtiene el objeto Software específico
     if request.method == "POST":
-        # Elimina el objeto Software y crea una notificación
-        software.delete()
-        notificacion = Notificacion.objects.create(
-            mensaje=f"{software.nombre}",
-            tipo_cambio="eliminar"
-        )
-        # Redirige a la lista de software
-        return redirect('software_list')
-    # Renderiza la plantilla 'software_confirm_delete.html' con el contexto del software
-    return render(request, 'software_confirm_delete.html', {'software': software})
+        software.delete()  # Elimina el objeto Software
+        # Crea una notificación para el software eliminado
+        Notificacion.objects.create(mensaje=f"{software.nombre}", tipo_cambio="eliminar")
+        return redirect('software_list')  # Redirige a la lista de software
+    return render(request, 'software_confirm_delete.html', {'software': software})  # Renderiza la plantilla

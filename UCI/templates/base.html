@@ -4,7 +4,7 @@
 <head>
     <title>UCI</title>
     <!-- Agrega Bootstrap para estilos básicos -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
     <!-- Enlace al archivo CSS estático -->
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <style>
@@ -26,9 +26,28 @@
             <h1>Gestión de Recursos UCI</h1>
             <nav>
                 <div class="btn-group mb-3">
-                    <a class="btn btn-outline-secondary" href="{% url 'software_list' %}">Software</a>
-                    <a class="btn btn-outline-secondary ml-3" href="{% url 'hardware_list' %}">Hardware</a>
-                    <a class="btn btn-outline-secondary ml-3" href="{% url 'notificacion_list' %}">Notificaciones</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'software_list' %}">Software
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code-square" viewBox="0 0 16 16">
+                            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                            <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0m2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0"/>
+                        </svg>
+                    </a>
+                    <a class="btn btn-outline-secondary ml-3" href="{% url 'hardware_list' %}">Hardware
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard" viewBox="0 0 16 16">
+                            <path d="M11.5 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m2 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-10 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM5 3a1 1 0 0 0-1 1h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0zm0 1h3v3H5zm6.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                            <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm1 11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z"/>
+                        </svg>
+                    </a>
+                    <a class="btn btn-outline-secondary ml-3" href="{% url 'notificacion_list' %}">Notificaciones
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+                        </svg>
+                        {% if unread_notifications_count > 99 %}
+                            <span id="notification-count" class="badge badge-danger">{{ unread_notifications_count|default:"99+" }}</span>
+                        {% elif unread_notifications_count %}
+                            <span id="notification-count" class="badge badge-danger">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
                 </div>
             </nav>
         </header>
@@ -50,19 +69,32 @@
                 var prioridad = data['prioridad'];
 
                 var notificacion = document.createElement('div');
-                notificacion.className = 'alert ' + (prioridad === 'alta' ? 'alert-danger' : (prioridad === 'media' ? 'alert-warning' : 'alert-secondary'));
+                notificacion.className = 'alert ' + (prioridad === 'alta' ? 'alert-danger' : (prioridad === 'media' ? 'alert-warning' : 'alert-info'));
                 notificacion.innerText = mensaje;
+                document.getElementById('notifications').appendChild(notificacion);
 
-                document.getElementById('notifications').prepend(notificacion);
-
-                setTimeout(() => {
-                    notificacion.remove();
-                }, 5000);  // Eliminar notificación después de 5 segundos
+                // Actualizar el contador de notificaciones
+                updateNotificationCount();
             };
 
-            socket.onclose = function(e) {
-                console.error('Chat socket closed unexpectedly');
-            };
+            function updateNotificationCount() {
+                fetch('/notificaciones/contador/')  // Punto de consulta del contador
+                    .then(response => response.json())
+                    .then(data => {
+                        const count = data.unread_notifications_count;
+                        const notificationBadge = document.getElementById('notification-count');
+                        if (notificationBadge) {
+                            if (count > 99) {
+                                notificationBadge.innerText = '99+';
+                            } else {
+                                notificationBadge.innerText = count;
+                            }
+                        }
+                    });
+            }
+
+            // Actualizar el contador al cargar la página
+            updateNotificationCount();
         });
     </script>
 </body>

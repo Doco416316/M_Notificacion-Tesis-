@@ -26,7 +26,10 @@ def hardware_create(request):
         if form.is_valid():  # Valida el formulario
             hardware = form.save()  # Guarda el nuevo hardware en la base de datos
             # Crea una notificación indicando que se ha agregado un nuevo hardware
-            notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", origen="hardware")
+            Notificacion.objects.create(
+                mensaje=f"{hardware.nombre}",
+                origen="hardware"
+            )
             print("Nombre del hardware ", hardware.nombre)
             # Redirige a la vista de detalles del hardware recién creado
             return redirect('hardware_detail', pk=hardware.pk)
@@ -43,11 +46,15 @@ def hardware_update(request, pk):
         if form.is_valid():  # Valida el formulario
             hardware = form.save()  # Guarda los cambios en la base de datos
             # Crea una notificación indicando que el hardware ha sido modificado
-            notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", tipo_cambio="modificar", origen="hardware")
+            Notificacion.objects.create(
+                mensaje=f"{hardware.nombre}",
+                tipo_cambio="modificar",
+                origen="hardware"
+            )
             # Redirige a la vista de detalles del hardware actualizado
             return redirect('hardware_detail', pk=hardware.pk)
     else:
-        form = HardwareForm(instance=hardware)  # Si no es una solicitud POST, crea un formulario pre-rellenado con el hardware existente
+        form = HardwareForm(instance=hardware)  # Crea un formulario pre-rellenado con el hardware existente
     # Renderiza la plantilla 'hardware_form.html' y le pasa el formulario
     return render(request, 'hardware_form.html', {'form': form})
 
@@ -57,7 +64,11 @@ def hardware_delete(request, pk):
     if request.method == "POST":  # Verifica si la solicitud es POST (es decir, si el usuario ha confirmado la eliminación)
         hardware.delete()  # Elimina el hardware de la base de datos
         # Crea una notificación indicando que el hardware ha sido eliminado
-        notificacion = Notificacion.objects.create(mensaje=f"{hardware.nombre}", tipo_cambio="eliminar", origen="hardware")
+        Notificacion.objects.create(
+            mensaje=f"{hardware.nombre}",
+            tipo_cambio="eliminar",
+            origen="hardware"
+        )
         # Redirige a la vista de lista de hardware
         return redirect('hardware_list')
     # Renderiza la plantilla 'hardware_confirm_delete.html' para confirmar la eliminación
